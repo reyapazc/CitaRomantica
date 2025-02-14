@@ -32,6 +32,16 @@
             background-size: 300px 300px;
             cursor: pointer;
             border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+        .selected {
+            border: 3px solid red;
         }
     </style>
 </head>
@@ -40,8 +50,9 @@
     <div class="puzzle-container" id="puzzleContainer"></div>
     
     <script>
-        const imageUrl = './image.jpg'; // Cambia esta URL por la imagen que quieras usar
+        const imageUrl = './image.jpg'; // Usando la imagen del repositorio
         let positions = [0,1,2,3,4,5,6,7,8].sort(() => Math.random() - 0.5);
+        let selectedPiece = null;
 
         function createPuzzle() {
             const container = document.getElementById("puzzleContainer");
@@ -52,19 +63,26 @@
                 piece.style.backgroundImage = `url(${imageUrl})`;
                 piece.style.backgroundPosition = `-${(pos % 3) * 100}px -${Math.floor(pos / 3) * 100}px`;
                 piece.setAttribute("data-index", index);
-                piece.onclick = () => swapPiece(index);
+                piece.onclick = () => selectPiece(index, piece);
                 container.appendChild(piece);
             });
         }
         
-        function swapPiece(index) {
-            let emptyIndex = positions.indexOf(8);
-            let validMoves = [emptyIndex - 1, emptyIndex + 1, emptyIndex - 3, emptyIndex + 3];
-            if (validMoves.includes(index)) {
-                [positions[emptyIndex], positions[index]] = [positions[index], positions[emptyIndex]];
-                createPuzzle();
-                checkWin();
+        function selectPiece(index, piece) {
+            if (selectedPiece === null) {
+                selectedPiece = { index, element: piece };
+                piece.classList.add("selected");
+            } else {
+                swapPieces(selectedPiece.index, index);
+                selectedPiece.element.classList.remove("selected");
+                selectedPiece = null;
             }
+        }
+        
+        function swapPieces(index1, index2) {
+            [positions[index1], positions[index2]] = [positions[index2], positions[index1]];
+            createPuzzle();
+            checkWin();
         }
         
         function checkWin() {
