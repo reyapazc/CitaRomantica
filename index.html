@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¿Quieres salir conmigo?</title>
+    <title>Rompecabezas del Amor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body, html {
@@ -20,54 +20,60 @@
             color: #ff4d4d;
             margin-bottom: 20px;
         }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
         }
-        .btn {
-            font-size: 20px;
-            padding: 10px 20px;
-            margin: 10px;
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            background-size: 300px 300px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-yes {
-            background-color: #ff4d4d;
-            color: white;
-        }
-        .btn-no {
-            background-color: #cccccc;
-            color: black;
+            border: 1px solid #000;
         }
     </style>
 </head>
 <body>
-    <h1>¿Quieres salir conmigo este 14 de febrero? ❤️</h1>
-    <div class="container">
-        <button class="btn btn-yes" onclick="yesClicked()">Sí</button>
-        <button class="btn btn-no" onclick="noClicked()">No</button>
-    </div>
+    <h1>Arma el rompecabezas para descubrir el mensaje ❤️</h1>
+    <div class="puzzle-container" id="puzzleContainer"></div>
+    
     <script>
-        let noButton = document.querySelector('.btn-no');
-        let yesButton = document.querySelector('.btn-yes');
-        let clicks = 0;
+        const imageUrl = 'https://github.com/reyapazc/CitaRomantica/blob/main/WhatsApp%20Image%202025-02-13%20at%2020.36.51_9b979625.jpg'; // Cambia esta URL por la imagen que quieras usar
+        let positions = [0,1,2,3,4,5,6,7,8].sort(() => Math.random() - 0.5);
 
-        function noClicked() {
-            clicks++;
-            let scaleFactor = 1 + (clicks * 1.5);
-            yesButton.style.transform = `scale(${scaleFactor})`;
-            if (clicks >= 3) {
-                yesButton.style.width = '100vw';
-                yesButton.style.height = '100vh';
-                yesButton.style.fontSize = '50px';
+        function createPuzzle() {
+            const container = document.getElementById("puzzleContainer");
+            container.innerHTML = '';
+            positions.forEach((pos, index) => {
+                const piece = document.createElement("div");
+                piece.classList.add("puzzle-piece");
+                piece.style.backgroundImage = `url(${imageUrl})`;
+                piece.style.backgroundPosition = `-${(pos % 3) * 100}px -${Math.floor(pos / 3) * 100}px`;
+                piece.setAttribute("data-index", index);
+                piece.onclick = () => swapPiece(index);
+                container.appendChild(piece);
+            });
+        }
+        
+        function swapPiece(index) {
+            let emptyIndex = positions.indexOf(8);
+            let validMoves = [emptyIndex - 1, emptyIndex + 1, emptyIndex - 3, emptyIndex + 3];
+            if (validMoves.includes(index)) {
+                [positions[emptyIndex], positions[index]] = [positions[index], positions[emptyIndex]];
+                createPuzzle();
+                checkWin();
             }
         }
-
-        function yesClicked() {
-            document.body.innerHTML = '<h1 class="text-center text-danger">¡Sabía que dirías que sí! 💖</h1>';
+        
+        function checkWin() {
+            if (positions.every((pos, i) => pos === i)) {
+                document.body.innerHTML = '<h1 class="text-center text-danger">¡Sabía que lo lograrías! 💖 Nos vemos el 14 de febrero</h1>';
+            }
         }
+        
+        createPuzzle();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
